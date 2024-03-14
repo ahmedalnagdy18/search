@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:search_app/constant/strings.dart';
+import 'package:search_app/features/search/data/data_sources/cart.dart';
+
+import 'package:search_app/features/search/data/repositories_imp/cart_repository_imp.dart';
+import 'package:search_app/features/search/domain/usecase/cart_usecase.dart';
+import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/pages/search_page.dart';
 
 void main() {
-  //init();
+  // init();
   runApp(const MyApp());
 }
 
@@ -11,9 +18,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SearchPage(),
+      home: BlocProvider<CartsCubit>(
+        create: (context) => CartsCubit(CartUsecase(
+            repository: CartRepositoryImpl(CartRemoteDataSource(baseUrl))))
+          ..getCarts(),
+        child: const SearchPage(),
+      ),
     );
   }
 }

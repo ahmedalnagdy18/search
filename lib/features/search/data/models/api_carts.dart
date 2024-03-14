@@ -27,11 +27,11 @@ class Cart {
 class Product {
   int id;
   String title;
-  double price;
+  num price;
   int quantity;
-  double total;
-  double discountPercentage;
-  double discountedPrice;
+  int total;
+  num discountPercentage;
+  num discountedPrice;
   String thumbnail;
 
   Product({
