@@ -57,8 +57,13 @@ class _SearchPageState extends State<SearchPage> {
 
   void _addToStory(Map<String, dynamic> cartData) {
     setState(() {
-      _showProduct = true;
-      _itemsAdded = true;
+      if (_showProduct && _itemsAdded) {
+        _showProduct = false;
+        _itemsAdded = false;
+      } else {
+        _showProduct = true;
+        _itemsAdded = true;
+      }
     });
   }
 
