@@ -33,6 +33,7 @@ class Product {
   num discountPercentage;
   num discountedPrice;
   String thumbnail;
+  bool stutas = false;
 
   Product({
     required this.id,

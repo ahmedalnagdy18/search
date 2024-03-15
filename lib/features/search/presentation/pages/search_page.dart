@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:search_app/features/search/data/models/api_carts.dart';
 
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
@@ -30,8 +31,7 @@ class _SearchPageState extends State<SearchPage> {
   ];
 
   List<Map<String, dynamic>> _foundUsers = [];
-  bool _showProduct = false;
-  bool _itemsAdded = false;
+  final List<Product> _story = [];
 
   @override
   initState() {
@@ -55,29 +55,28 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void _addToStory(Map<String, dynamic> cartData) {
+  void _addToStory(Product product) {
     setState(() {
-      if (_showProduct && _itemsAdded) {
-        _showProduct = false;
-        _itemsAdded = false;
+      if (product.stutas == false) {
+        product.stutas = true;
+        _story.add(product);
       } else {
-        _showProduct = true;
-        _itemsAdded = true;
+        product.stutas = false;
+        _story.remove(product);
       }
     });
   }
 
-  void removeFromStory() {
+  void removeFromStory(Product product) {
     setState(() {
-      _showProduct = false;
-      _itemsAdded = false;
+      product.stutas = false;
+      _story.remove(product);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<CartsCubit, CartsState>(
-      listener: (context, state) {},
+    return BlocBuilder<CartsCubit, CartsState>(
       builder: (context, state) => state is CartsLoaded
           ? SafeArea(
               child: Scaffold(
@@ -89,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 30),
-                        _showProduct
+                        _story.isNotEmpty
                             ? SizedBox(
                                 height: 80,
                                 child: ListView.separated(
@@ -97,25 +96,16 @@ class _SearchPageState extends State<SearchPage> {
                                   physics: const BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
-                                    if (index < state.carts.length) {
-                                      final cart = state.carts[index];
-                                      if (index < cart.products.length) {
-                                        return StoryCartList(
-                                            onTap: removeFromStory,
-                                            backgroundImage: NetworkImage(
-                                                cart.products[index].thumbnail),
-                                            title:
-                                                "Price: ${cart.products[index].price.toString()}");
-                                      } else {
-                                        return Container();
-                                      }
-                                    } else {
-                                      return Container();
-                                    }
+                                    return StoryCartList(
+                                        onTap: (() =>
+                                            removeFromStory(_story[index])),
+                                        backgroundImage: NetworkImage(
+                                            _story[index].thumbnail),
+                                        title: "Price: ${_story[index].price}");
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(width: 10),
-                                  itemCount: state.carts.length,
+                                  itemCount: _story.length,
                                 ),
                               )
                             : const Center(
@@ -198,14 +188,20 @@ class _SearchPageState extends State<SearchPage> {
                                                       onPressed: () {
                                                         _addToStory(state
                                                             .carts[index]
-                                                            .toJson());
+                                                            .products[ind]);
                                                       },
-                                                      color: _itemsAdded
+                                                      color: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
                                                           ? Colors.red
                                                           : const Color
                                                               .fromARGB(255,
                                                               103, 145, 141),
-                                                      text: _itemsAdded
+                                                      text: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
                                                           ? "remove"
                                                           : "add",
                                                     ),
