@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
 class StoryCartList extends StatelessWidget {
-  const StoryCartList({super.key, required this.onTap});
+  const StoryCartList(
+      {super.key,
+      required this.onTap,
+      required this.backgroundImage,
+      required this.title});
   final void Function()? onTap;
+  final ImageProvider<Object>? backgroundImage;
+  final String title;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -10,10 +16,9 @@ class StoryCartList extends StatelessWidget {
         Stack(
           alignment: Alignment.topRight,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               maxRadius: 30,
-              backgroundImage: NetworkImage(
-                  "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg?size=338&ext=jpg&ga=GA1.1.1395880969.1710201600&semt=ais"),
+              backgroundImage: backgroundImage,
               backgroundColor: Colors.cyanAccent,
             ),
             InkWell(
@@ -28,7 +33,7 @@ class StoryCartList extends StatelessWidget {
             ),
           ],
         ),
-        const Text("price : 30"),
+        Text(title),
       ],
     );
   }

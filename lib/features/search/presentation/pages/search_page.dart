@@ -39,7 +39,7 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
   }
 
-  void _runFilter(String enteredKeyword) {
+  void _searchFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
     if (enteredKeyword.isEmpty) {
       results = _allUsers;
@@ -55,18 +55,14 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void _toggleGreenContainerVisibility() {
+  void _addToStory(Map<String, dynamic> cartData) {
     setState(() {
-      if (_showProduct) {
-        _showProduct = true;
-      } else {
-        _showProduct = true;
-      }
+      _showProduct = true;
       _itemsAdded = true;
     });
   }
 
-  void removeDynamicWidget() {
+  void removeFromStory() {
     setState(() {
       _showProduct = false;
       _itemsAdded = false;
@@ -96,8 +92,13 @@ class _SearchPageState extends State<SearchPage> {
                                   physics: const BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
+                                    final cart = state.carts[index];
                                     return StoryCartList(
-                                        onTap: removeDynamicWidget);
+                                      onTap: removeFromStory,
+                                      backgroundImage: NetworkImage(
+                                          cart.products[index].thumbnail),
+                                      title: "Price: ${cart.products}",
+                                    );
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(width: 10),
@@ -108,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
                                 child: Text("Add Products here ...")),
                         const SizedBox(height: 20),
                         TextfieldWidget(
-                          onChanged: (value) => _runFilter(value),
+                          onChanged: (value) => _searchFilter(value),
                           controller: _searchController,
                           onPressed: () {
                             _searchController.clear();
@@ -167,8 +168,7 @@ class _SearchPageState extends State<SearchPage> {
                                                                         ind]
                                                                     .thumbnail),
                                                             backgroundColor:
-                                                                Colors
-                                                                    .cyanAccent,
+                                                                Colors.white,
                                                           ),
                                                           Text(
                                                             state
@@ -183,7 +183,9 @@ class _SearchPageState extends State<SearchPage> {
                                                     ),
                                                     AppButtonWidget(
                                                       onPressed: () {
-                                                        _toggleGreenContainerVisibility();
+                                                        _addToStory(state
+                                                            .carts[index]
+                                                            .toJson());
                                                       },
                                                       color: _itemsAdded
                                                           ? Colors.red
