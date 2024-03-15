@@ -97,13 +97,21 @@ class _SearchPageState extends State<SearchPage> {
                                   physics: const BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
-                                    final cart = state.carts[index];
-                                    return StoryCartList(
-                                      onTap: removeFromStory,
-                                      backgroundImage: NetworkImage(
-                                          cart.products[index].thumbnail),
-                                      title: "Price: ${cart.products}",
-                                    );
+                                    if (index < state.carts.length) {
+                                      final cart = state.carts[index];
+                                      if (index < cart.products.length) {
+                                        return StoryCartList(
+                                            onTap: removeFromStory,
+                                            backgroundImage: NetworkImage(
+                                                cart.products[index].thumbnail),
+                                            title:
+                                                "Price: ${cart.products[index].price.toString()}");
+                                      } else {
+                                        return Container();
+                                      }
+                                    } else {
+                                      return Container();
+                                    }
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(width: 10),
