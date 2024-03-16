@@ -4,7 +4,7 @@ import 'package:search_app/features/search/data/models/api_carts.dart';
 
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
-import 'package:search_app/features/search/presentation/widgets/app_button.dart';
+import 'package:search_app/features/search/presentation/widgets/search_page_widget/cart_item_widget.dart';
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/story_cart_list.dart';
 import 'package:search_app/features/search/presentation/widgets/textfield_widget.dart';
 
@@ -155,70 +155,27 @@ class _SearchPageState extends State<SearchPage> {
                                         children: [
                                           ListView.separated(
                                             itemBuilder: (context, ind) {
-                                              return Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 20,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          CircleAvatar(
-                                                            backgroundImage:
-                                                                NetworkImage(state
-                                                                    .carts[
-                                                                        index]
-                                                                    .products[
-                                                                        ind]
-                                                                    .thumbnail),
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                          ),
-                                                          Text(
-                                                            state
-                                                                .carts[index]
-                                                                .products[ind]
-                                                                .title,
-                                                            textAlign:
-                                                                TextAlign.start,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    AppButtonWidget(
-                                                      onPressed: () {
-                                                        _addToStory(state
-                                                            .carts[index]
-                                                            .products[ind]);
-                                                      },
-                                                      color: state
-                                                              .carts[index]
-                                                              .products[ind]
-                                                              .stutas
-                                                          ? Colors.red
-                                                          : const Color
-                                                              .fromARGB(255,
-                                                              103, 145, 141),
-                                                      text: state
-                                                              .carts[index]
-                                                              .products[ind]
-                                                              .stutas
-                                                          ? "remove"
-                                                          : "add",
-                                                    ),
-                                                  ],
-                                                ),
+                                              return CartItemWidget(
+                                                onPressed: () {
+                                                  _addToStory(state.carts[index]
+                                                      .products[ind]);
+                                                },
+                                                color: state.carts[index]
+                                                        .products[ind].stutas
+                                                    ? Colors.red
+                                                    : const Color.fromARGB(
+                                                        255, 103, 145, 141),
+                                                text: state.carts[index]
+                                                    .products[ind].title,
+                                                backgroundImage: NetworkImage(
+                                                    state
+                                                        .carts[index]
+                                                        .products[ind]
+                                                        .thumbnail),
+                                                textButton: state.carts[index]
+                                                        .products[ind].stutas
+                                                    ? "remove"
+                                                    : "add",
                                               );
                                             },
                                             itemCount: state
@@ -264,76 +221,32 @@ class _SearchPageState extends State<SearchPage> {
                                             children: [
                                               ListView.separated(
                                                 itemBuilder: (context, ind) {
-                                                  return Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 20,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          Colors.grey.shade200,
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Expanded(
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              CircleAvatar(
-                                                                backgroundImage:
-                                                                    NetworkImage(_foundUsers[
-                                                                            index]
-                                                                        .products[
-                                                                            ind]
-                                                                        .thumbnail),
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                              ),
-                                                              Text(
-                                                                _foundUsers[
-                                                                        index]
-                                                                    .products[
-                                                                        ind]
-                                                                    .title,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        AppButtonWidget(
-                                                          onPressed: () {
-                                                            _addToStory(_foundUsers[
-                                                                    index]
-                                                                .products[ind]);
-                                                          },
-                                                          color: _foundUsers[
-                                                                      index]
-                                                                  .products[ind]
-                                                                  .stutas
-                                                              ? Colors.red
-                                                              : const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  103,
-                                                                  145,
-                                                                  141),
-                                                          text: _foundUsers[
-                                                                      index]
-                                                                  .products[ind]
-                                                                  .stutas
-                                                              ? "remove"
-                                                              : "add",
-                                                        ),
-                                                      ],
-                                                    ),
+                                                  return CartItemWidget(
+                                                    onPressed: () {
+                                                      _addToStory(state
+                                                          .carts[index]
+                                                          .products[ind]);
+                                                    },
+                                                    color: state
+                                                            .carts[index]
+                                                            .products[ind]
+                                                            .stutas
+                                                        ? Colors.red
+                                                        : const Color.fromARGB(
+                                                            255, 103, 145, 141),
+                                                    text: state.carts[index]
+                                                        .products[ind].title,
+                                                    backgroundImage:
+                                                        NetworkImage(state
+                                                            .carts[index]
+                                                            .products[ind]
+                                                            .thumbnail),
+                                                    textButton: state
+                                                            .carts[index]
+                                                            .products[ind]
+                                                            .stutas
+                                                        ? "remove"
+                                                        : "add",
                                                   );
                                                 },
                                                 itemCount: _foundUsers[index]
