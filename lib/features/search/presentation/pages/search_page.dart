@@ -16,6 +16,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  int num = 10;
+  final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Cart> _allUsers = [];
   void _searchFilter(String title, List<Cart> carts) {
@@ -52,6 +54,14 @@ class _SearchPageState extends State<SearchPage> {
   @override
   initState() {
     _foundUsers = _allUsers;
+    _scrollcontroller.addListener(() {
+      if (_scrollcontroller.position.pixels ==
+          _scrollcontroller.position.maxScrollExtent) {
+        setState(() {
+          num = 20;
+        });
+      }
+    });
     super.initState();
   }
 
@@ -123,8 +133,9 @@ class _SearchPageState extends State<SearchPage> {
                         Expanded(
                           child: _searchController.text.isEmpty
                               ? ListView.separated(
+                                  controller: _scrollcontroller,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount: state.carts.length,
+                                  itemCount: num,
                                   itemBuilder: (context, index) {
                                     return Container(
                                       key: ValueKey(state.carts[index].id),
@@ -229,6 +240,7 @@ class _SearchPageState extends State<SearchPage> {
                                 )
                               : _searchController.text.isNotEmpty
                                   ? ListView.separated(
+                                      controller: _scrollcontroller,
                                       physics: const BouncingScrollPhysics(),
                                       itemCount: _foundUsers.length,
                                       itemBuilder: (context, index) {
