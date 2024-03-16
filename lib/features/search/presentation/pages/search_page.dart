@@ -5,6 +5,7 @@ import 'package:search_app/features/search/data/models/api_carts.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/cart_item_widget.dart';
+
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/story_cart_list.dart';
 import 'package:search_app/features/search/presentation/widgets/textfield_widget.dart';
 
@@ -126,152 +127,160 @@ class _SearchPageState extends State<SearchPage> {
                               _searchFilter(value, state.carts),
                           controller: _searchController,
                           onPressed: () {
-                            _searchController.clear();
+                            setState(() {
+                              _searchController.clear();
+                            });
                           },
                         ),
                         const SizedBox(height: 20),
                         Expanded(
-                          child: _searchController.text.isEmpty
-                              ? ListView.separated(
-                                  controller: _scrollcontroller,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: num,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      key: ValueKey(state.carts[index].id),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: ExpansionTile(
-                                        backgroundColor: Colors.grey.shade200,
-                                        shape: ContinuousRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(35)),
-                                        title: Text(
-                                            "Cart ${state.carts[index].id}",
-                                            style: const TextStyle(
-                                                color: Colors.black)),
-                                        children: [
-                                          ListView.separated(
-                                            itemBuilder: (context, ind) {
-                                              return CartItemWidget(
-                                                onPressed: () {
-                                                  _addToStory(state.carts[index]
-                                                      .products[ind]);
-                                                },
-                                                color: state.carts[index]
-                                                        .products[ind].stutas
-                                                    ? Colors.red
-                                                    : const Color.fromARGB(
-                                                        255, 103, 145, 141),
-                                                text: state.carts[index]
-                                                    .products[ind].title,
-                                                backgroundImage: NetworkImage(
-                                                    state
+                            child: _searchController.text.isEmpty
+                                ? ListView.separated(
+                                    controller: _scrollcontroller,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: num,
+                                    itemBuilder: (context, index) {
+                                      return Container(
+                                        key: ValueKey(state.carts[index].id),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: ExpansionTile(
+                                          backgroundColor: Colors.grey.shade200,
+                                          shape: ContinuousRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(35)),
+                                          title: Text(
+                                              "Cart ${state.carts[index].id}",
+                                              style: const TextStyle(
+                                                  color: Colors.black)),
+                                          children: [
+                                            ListView.separated(
+                                              itemBuilder: (context, ind) {
+                                                return CartItemWidget(
+                                                  onPressed: () {
+                                                    _addToStory(state
                                                         .carts[index]
-                                                        .products[ind]
-                                                        .thumbnail),
-                                                textButton: state.carts[index]
-                                                        .products[ind].stutas
-                                                    ? "remove"
-                                                    : "add",
-                                              );
-                                            },
-                                            itemCount: state
-                                                .carts[index].products.length,
-                                            shrinkWrap: true,
-                                            physics:
-                                                const BouncingScrollPhysics(),
-                                            separatorBuilder:
-                                                (context, index) =>
-                                                    const SizedBox(height: 10),
-                                          ),
-                                          const SizedBox(height: 20),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(height: 15),
-                                )
-                              : _searchController.text.isNotEmpty
-                                  ? ListView.separated(
-                                      controller: _scrollcontroller,
-                                      physics: const BouncingScrollPhysics(),
-                                      itemCount: _foundUsers.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          key: ValueKey(_foundUsers[index].id),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: ExpansionTile(
-                                            backgroundColor:
-                                                Colors.grey.shade200,
-                                            shape: ContinuousRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(35)),
-                                            title: Text(
-                                                "Cart ${_foundUsers[index].id}",
-                                                style: const TextStyle(
-                                                    color: Colors.black)),
-                                            children: [
-                                              ListView.separated(
-                                                itemBuilder: (context, ind) {
-                                                  return CartItemWidget(
-                                                    onPressed: () {
-                                                      _addToStory(state
+                                                        .products[ind]);
+                                                  },
+                                                  color: state.carts[index]
+                                                          .products[ind].stutas
+                                                      ? Colors.red
+                                                      : const Color.fromARGB(
+                                                          255, 103, 145, 141),
+                                                  text: state.carts[index]
+                                                      .products[ind].title,
+                                                  backgroundImage: NetworkImage(
+                                                      state
                                                           .carts[index]
-                                                          .products[ind]);
-                                                    },
-                                                    color: state
+                                                          .products[ind]
+                                                          .thumbnail),
+                                                  textButton: state.carts[index]
+                                                          .products[ind].stutas
+                                                      ? "remove"
+                                                      : "add",
+                                                );
+                                              },
+                                              itemCount: state
+                                                  .carts[index].products.length,
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const BouncingScrollPhysics(),
+                                              separatorBuilder: (context,
+                                                      index) =>
+                                                  const SizedBox(height: 10),
+                                            ),
+                                            const SizedBox(height: 20),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 15),
+                                  )
+                                : _searchController.text.isNotEmpty &&
+                                        _foundUsers.isEmpty
+                                    ? const Text(
+                                        'No results found',
+                                        style: TextStyle(fontSize: 24),
+                                      )
+                                    : ListView.separated(
+                                        controller: _scrollcontroller,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemCount: _foundUsers.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            key:
+                                                ValueKey(_foundUsers[index].id),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade200,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: ExpansionTile(
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              shape: ContinuousRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          35)),
+                                              title: Text(
+                                                  "Cart ${_foundUsers[index].id}",
+                                                  style: const TextStyle(
+                                                      color: Colors.black)),
+                                              children: [
+                                                ListView.separated(
+                                                  itemBuilder: (context, ind) {
+                                                    return CartItemWidget(
+                                                      onPressed: () {
+                                                        _addToStory(state
                                                             .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? Colors.red
-                                                        : const Color.fromARGB(
-                                                            255, 103, 145, 141),
-                                                    text: state.carts[index]
-                                                        .products[ind].title,
-                                                    backgroundImage:
-                                                        NetworkImage(state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .thumbnail),
-                                                    textButton: state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? "remove"
-                                                        : "add",
-                                                  );
-                                                },
-                                                itemCount: _foundUsers[index]
-                                                    .products
-                                                    .length,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    const SizedBox(height: 10),
-                                              ),
-                                              const SizedBox(height: 20),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(height: 15),
-                                    )
-                                  : const Text(
-                                      'No results found',
-                                      style: TextStyle(fontSize: 24),
-                                    ),
-                        ),
+                                                            .products[ind]);
+                                                      },
+                                                      color: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
+                                                          ? Colors.red
+                                                          : const Color
+                                                              .fromARGB(255,
+                                                              103, 145, 141),
+                                                      text: state.carts[index]
+                                                          .products[ind].title,
+                                                      backgroundImage:
+                                                          NetworkImage(state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .thumbnail),
+                                                      textButton: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
+                                                          ? "remove"
+                                                          : "add",
+                                                    );
+                                                  },
+                                                  itemCount: _foundUsers[index]
+                                                      .products
+                                                      .length,
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          const SizedBox(
+                                                              height: 10),
+                                                ),
+                                                const SizedBox(height: 20),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(height: 15),
+                                      )),
                       ],
                     ),
                   ),
