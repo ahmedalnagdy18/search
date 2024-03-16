@@ -17,42 +17,42 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _searchController = TextEditingController();
-  final List<Map<String, dynamic>> _allUsers = [
-    {"id": 1, "name": "Cart 1"},
-    {"id": 2, "name": "Cart 2"},
-    {"id": 3, "name": "Cart 3"},
-    {"id": 4, "name": "Cart 4"},
-    {"id": 5, "name": "Cart 5"},
-    {"id": 6, "name": "Cart 6"},
-    {"id": 7, "name": "Cart 7"},
-    {"id": 8, "name": "Cart 8"},
-    {"id": 9, "name": "Cart 9"},
-    {"id": 10, "name": "Cart 10"},
-  ];
+  final List<Cart> _allUsers = [];
+  void _searchFilter(String title, List<Cart> carts) {
+    List<Cart> results = [];
 
-  List<Map<String, dynamic>> _foundUsers = [];
+    if (title.isEmpty) {
+      setState(() {
+        _foundUsers = _allUsers;
+      });
+    } else {
+      for (var i = 0; i < carts.length; i++) {
+        List<Product> hh = carts[i]
+            .products
+            .where((element) =>
+                element.title.toLowerCase().contains(title.toLowerCase()))
+            .toList();
+        results.add(Cart(id: carts[i].id, products: hh));
+        for (var j = 0; j < results.length; j++) {
+          if (results[j].products.isEmpty) {
+            results.removeAt(j);
+          }
+        }
+      }
+
+      setState(() {
+        _foundUsers = results;
+      });
+    }
+  }
+
+  List<Cart> _foundUsers = [];
   final List<Product> _story = [];
 
   @override
   initState() {
     _foundUsers = _allUsers;
     super.initState();
-  }
-
-  void _searchFilter(String enteredKeyword) {
-    List<Map<String, dynamic>> results = [];
-    if (enteredKeyword.isEmpty) {
-      results = _allUsers;
-    } else {
-      results = _allUsers
-          .where((user) =>
-              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-    }
-
-    setState(() {
-      _foundUsers = results;
-    });
   }
 
   void _addToStory(Product product) {
@@ -112,7 +112,8 @@ class _SearchPageState extends State<SearchPage> {
                                 child: Text("Add Products here ...")),
                         const SizedBox(height: 20),
                         TextfieldWidget(
-                          onChanged: (value) => _searchFilter(value),
+                          onChanged: (value) =>
+                              _searchFilter(value, state.carts),
                           controller: _searchController,
                           onPressed: () {
                             _searchController.clear();
@@ -120,7 +121,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         const SizedBox(height: 20),
                         Expanded(
-                          child: _foundUsers.isNotEmpty
+                          child: _searchController.text.isEmpty
                               ? ListView.separated(
                                   physics: const BouncingScrollPhysics(),
                                   itemCount: state.carts.length,
@@ -226,10 +227,125 @@ class _SearchPageState extends State<SearchPage> {
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(height: 15),
                                 )
-                              : const Text(
-                                  'No results found',
-                                  style: TextStyle(fontSize: 24),
-                                ),
+                              : _searchController.text.isNotEmpty
+                                  ? ListView.separated(
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount: _foundUsers.length,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          key: ValueKey(_foundUsers[index].id),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          child: ExpansionTile(
+                                            backgroundColor:
+                                                Colors.grey.shade200,
+                                            shape: ContinuousRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(35)),
+                                            title: Text(
+                                                "Cart ${_foundUsers[index].id}",
+                                                style: const TextStyle(
+                                                    color: Colors.black)),
+                                            children: [
+                                              ListView.separated(
+                                                itemBuilder: (context, ind) {
+                                                  return Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                      horizontal: 20,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.grey.shade200,
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(_foundUsers[
+                                                                            index]
+                                                                        .products[
+                                                                            ind]
+                                                                        .thumbnail),
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
+                                                              Text(
+                                                                _foundUsers[
+                                                                        index]
+                                                                    .products[
+                                                                        ind]
+                                                                    .title,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        AppButtonWidget(
+                                                          onPressed: () {
+                                                            _addToStory(_foundUsers[
+                                                                    index]
+                                                                .products[ind]);
+                                                          },
+                                                          color: _foundUsers[
+                                                                      index]
+                                                                  .products[ind]
+                                                                  .stutas
+                                                              ? Colors.red
+                                                              : const Color
+                                                                  .fromARGB(
+                                                                  255,
+                                                                  103,
+                                                                  145,
+                                                                  141),
+                                                          text: _foundUsers[
+                                                                      index]
+                                                                  .products[ind]
+                                                                  .stutas
+                                                              ? "remove"
+                                                              : "add",
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                                itemCount: _foundUsers[index]
+                                                    .products
+                                                    .length,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 10),
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(height: 15),
+                                    )
+                                  : const Text(
+                                      'No results found',
+                                      style: TextStyle(fontSize: 24),
+                                    ),
                         ),
                       ],
                     ),
