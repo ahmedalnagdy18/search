@@ -245,7 +245,7 @@ class _SearchPageState extends State<SearchPage> {
                                                 style: TextStyle(fontSize: 14),
                                               ),
                                             ),
-                                          SizedBox(height: 12),
+                                          const SizedBox(height: 12),
                                         ],
                                       );
                                     } else {
