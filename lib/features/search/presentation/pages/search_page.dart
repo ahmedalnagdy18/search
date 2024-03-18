@@ -18,6 +18,8 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   int num = 10;
+  bool isLoading = false;
+  bool reachedEnd = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Cart> _allUsers = [];
@@ -59,7 +61,16 @@ class _SearchPageState extends State<SearchPage> {
       if (_scrollcontroller.position.pixels ==
           _scrollcontroller.position.maxScrollExtent) {
         setState(() {
+          isLoading = true;
           num = 20;
+        });
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            isLoading = false;
+            if (_foundUsers.length >= _allUsers.length) {
+              reachedEnd = true;
+            }
+          });
         });
       }
     });
@@ -112,7 +123,8 @@ class _SearchPageState extends State<SearchPage> {
                                             removeFromStory(_story[index])),
                                         backgroundImage: NetworkImage(
                                             _story[index].thumbnail),
-                                        title: "Price: ${_story[index].price}");
+                                        title:
+                                            "Price: ${_story[index].price} \$");
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(width: 10),
@@ -143,12 +155,12 @@ class _SearchPageState extends State<SearchPage> {
                                       return Container(
                                         key: ValueKey(state.carts[index].id),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
+                                          color: Colors.grey.shade300,
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
                                         child: ExpansionTile(
-                                          backgroundColor: Colors.grey.shade200,
+                                          backgroundColor: Colors.grey.shade300,
                                           shape: ContinuousRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(35)),
@@ -215,13 +227,13 @@ class _SearchPageState extends State<SearchPage> {
                                             key:
                                                 ValueKey(_foundUsers[index].id),
                                             decoration: BoxDecoration(
-                                              color: Colors.grey.shade200,
+                                              color: Colors.grey.shade300,
                                               borderRadius:
                                                   BorderRadius.circular(20),
                                             ),
                                             child: ExpansionTile(
                                               backgroundColor:
-                                                  Colors.grey.shade200,
+                                                  Colors.grey.shade300,
                                               shape: ContinuousRectangleBorder(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -281,6 +293,29 @@ class _SearchPageState extends State<SearchPage> {
                                         separatorBuilder: (context, index) =>
                                             const SizedBox(height: 15),
                                       )),
+                        if (isLoading)
+                          const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(),
+                                ),
+                                SizedBox(width: 8),
+                                Text('Loading...'),
+                              ],
+                            ),
+                          ),
+                        if (!isLoading && reachedEnd)
+                          const Center(
+                            child: Text(
+                              'No more items',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        const SizedBox(height: 15),
                       ],
                     ),
                   ),

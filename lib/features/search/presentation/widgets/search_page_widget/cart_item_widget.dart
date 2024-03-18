@@ -20,7 +20,7 @@ class CartItemWidget extends StatelessWidget {
         horizontal: 20,
       ),
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        color: Colors.grey.shade300,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
