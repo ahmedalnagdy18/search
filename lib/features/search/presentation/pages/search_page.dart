@@ -22,25 +22,19 @@ class _SearchPageState extends State<SearchPage> {
   bool reachedEnd = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
-  final List<Cart> _allUsers = [];
+  final List<Product> _allUsers = [];
   void _searchFilter(String title, List<Cart> carts) {
-    List<Cart> results = [];
+    List<Product> results = [];
 
     if (title.isEmpty) {
       setState(() {
         _foundUsers = _allUsers;
       });
     } else {
-      for (var i = 0; i < carts.length; i++) {
-        List<Product> hh = carts[i]
-            .products
-            .where((element) =>
-                element.title.toLowerCase().contains(title.toLowerCase()))
-            .toList();
-        results.add(Cart(id: carts[i].id, products: hh));
-        for (var j = 0; j < results.length; j++) {
-          if (results[j].products.isEmpty) {
-            results.removeAt(j);
+      for (var element in carts) {
+        for (var el in element.products) {
+          if (el.title.toLowerCase().contains(title.toLowerCase())) {
+            results.add(el);
           }
         }
       }
@@ -51,7 +45,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  List<Cart> _foundUsers = [];
+  List<Product> _foundUsers = [];
   final List<Product> _story = [];
 
   @override
@@ -319,68 +313,104 @@ class _SearchPageState extends State<SearchPage> {
                                   : ListView.separated(
                                       controller: _scrollcontroller,
                                       physics: const BouncingScrollPhysics(),
-                                      itemCount: _foundUsers.length,
+                                      itemCount: state.carts
+                                          .where((element) => element.products
+                                              .where((element) => element.title
+                                                  .toLowerCase()
+                                                  .contains(_searchController
+                                                      .text
+                                                      .toLowerCase()))
+                                              .isNotEmpty)
+                                          .length,
                                       itemBuilder: (context, index) {
                                         return Container(
-                                          key: ValueKey(_foundUsers[index].id),
+                                          key: ValueKey(state.carts[index].id),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade300,
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                           ),
-                                          child: ExpansionTile(
-                                            backgroundColor:
-                                                Colors.grey.shade300,
-                                            shape: ContinuousRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(35)),
-                                            title: Text(
-                                                "Cart ${_foundUsers[index].id}",
-                                                style: const TextStyle(
-                                                    color: Colors.black)),
-                                            children: [
-                                              ListView.separated(
-                                                itemBuilder: (context, ind) {
-                                                  return CartItemWidget(
-                                                    onPressed: () {
-                                                      _addToStory(state
-                                                          .carts[index]
-                                                          .products[ind]);
-                                                    },
-                                                    color: state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? Colors.red
-                                                        : const Color.fromARGB(
-                                                            255, 103, 145, 141),
-                                                    text: state.carts[index]
-                                                        .products[ind].title,
-                                                    backgroundImage:
-                                                        NetworkImage(state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .thumbnail),
-                                                    textButton: state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? "remove"
-                                                        : "add",
-                                                  );
+                                          child: ListView.separated(
+                                            itemBuilder: (context, ind) {
+                                              return CartItemWidget(
+                                                onPressed: () {
+                                                  _addToStory(state
+                                                      .carts[index].products
+                                                      .where((element) => element
+                                                          .title
+                                                          .toLowerCase()
+                                                          .contains(
+                                                              _searchController
+                                                                  .text
+                                                                  .toLowerCase()))
+                                                      .elementAt(ind));
                                                 },
-                                                itemCount: _foundUsers[index]
-                                                    .products
-                                                    .length,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                separatorBuilder: (context,
-                                                        index) =>
+                                                color: state
+                                                        .carts[index].products
+                                                        .where((element) => element
+                                                            .title
+                                                            .toLowerCase()
+                                                            .contains(
+                                                                _searchController
+                                                                    .text
+                                                                    .toLowerCase()))
+                                                        .elementAt(ind)
+                                                        .stutas
+                                                    ? Colors.red
+                                                    : const Color.fromARGB(
+                                                        255, 103, 145, 141),
+                                                text: state
+                                                    .carts[index].products
+                                                    .where((element) => element
+                                                        .title
+                                                        .toLowerCase()
+                                                        .contains(
+                                                            _searchController
+                                                                .text
+                                                                .toLowerCase()))
+                                                    .elementAt(ind)
+                                                    .title,
+                                                backgroundImage: NetworkImage(state
+                                                    .carts[index].products
+                                                    .where((element) => element
+                                                        .title
+                                                        .toLowerCase()
+                                                        .contains(
+                                                            _searchController
+                                                                .text
+                                                                .toLowerCase()))
+                                                    .elementAt(ind)
+                                                    .thumbnail),
+                                                textButton: state
+                                                        .carts[index].products
+                                                        .where((element) => element
+                                                            .title
+                                                            .toLowerCase()
+                                                            .contains(
+                                                                _searchController
+                                                                    .text
+                                                                    .toLowerCase()))
+                                                        .elementAt(ind)
+                                                        .stutas
+                                                    ? "remove"
+                                                    : "add",
+                                              );
+                                            },
+                                            itemCount: state
+                                                .carts[index].products
+                                                .where((element) => element
+                                                    .title
+                                                    .toLowerCase()
+                                                    .contains(_searchController
+                                                        .text
+                                                        .toLowerCase()))
+                                                .length,
+                                            shrinkWrap: true,
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            separatorBuilder:
+                                                (context, index) =>
                                                     const SizedBox(height: 10),
-                                              ),
-                                              const SizedBox(height: 20),
-                                            ],
                                           ),
                                         );
                                       },
