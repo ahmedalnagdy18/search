@@ -17,9 +17,20 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  List<Cart> hh = [];
+  List<Cart> jj = [];
+  int ord = 0;
+  pagination() {
+    hh = BlocProvider.of<CartsCubit>(context).carts;
+    jj.addAll(hh.sublist(ord, ord + 10));
+    if (ord == 0) {
+      ord = 10;
+    } else {
+      ord = 0;
+    }
+  }
+
   int num = 10;
-  bool isLoading = false;
-  bool reachedEnd = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Product> _allUsers = [];
@@ -55,16 +66,7 @@ class _SearchPageState extends State<SearchPage> {
       if (_scrollcontroller.position.pixels ==
           _scrollcontroller.position.maxScrollExtent) {
         setState(() {
-          isLoading = true;
-          num = 20;
-        });
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            isLoading = false;
-            if (_foundUsers.length >= _allUsers.length) {
-              reachedEnd = true;
-            }
-          });
+          pagination();
         });
       }
     });
@@ -92,7 +94,12 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CartsCubit, CartsState>(
+    return BlocConsumer<CartsCubit, CartsState>(
+      listener: (context, state) {
+        if (state is CartsLoaded) {
+          jj = state.carts;
+        }
+      },
       builder: (context, state) => state is CartsLoaded
           ? SafeArea(
               child: Scaffold(
@@ -144,162 +151,72 @@ class _SearchPageState extends State<SearchPage> {
                               ? ListView.separated(
                                   controller: _scrollcontroller,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount: num,
+                                  itemCount: jj.length,
                                   itemBuilder: (context, index) {
-                                    if (index == num - 1) {
-                                      return Column(
-                                        children: [
-                                          Container(
-                                            key:
-                                                ValueKey(state.carts[index].id),
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey.shade300,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: ExpansionTile(
-                                              backgroundColor:
-                                                  Colors.grey.shade300,
-                                              shape: ContinuousRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          35)),
-                                              title: Text(
-                                                  "Cart ${state.carts[index].id}",
-                                                  style: const TextStyle(
-                                                      color: Colors.black)),
-                                              children: [
-                                                ListView.separated(
-                                                  itemBuilder: (context, ind) {
-                                                    return CartItemWidget(
-                                                      onPressed: () {
-                                                        _addToStory(state
-                                                            .carts[index]
-                                                            .products[ind]);
-                                                      },
-                                                      color: state
-                                                              .carts[index]
-                                                              .products[ind]
-                                                              .stutas
-                                                          ? Colors.red
-                                                          : const Color
-                                                              .fromARGB(255,
-                                                              103, 145, 141),
-                                                      text: state.carts[index]
-                                                          .products[ind].title,
-                                                      backgroundImage:
-                                                          NetworkImage(state
-                                                              .carts[index]
-                                                              .products[ind]
-                                                              .thumbnail),
-                                                      textButton: state
-                                                              .carts[index]
-                                                              .products[ind]
-                                                              .stutas
-                                                          ? "remove"
-                                                          : "add",
-                                                    );
-                                                  },
-                                                  itemCount: state.carts[index]
-                                                      .products.length,
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      const BouncingScrollPhysics(),
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          const SizedBox(
-                                                              height: 10),
-                                                ),
-                                                const SizedBox(height: 20),
-                                              ],
-                                            ),
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          key: ValueKey(state.carts[index].id),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade300,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
-                                          const SizedBox(height: 10),
-                                          if (isLoading)
-                                            const Center(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SizedBox(
-                                                    height: 20,
-                                                    width: 20,
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  ),
-                                                  SizedBox(width: 8),
-                                                  Text('Loading...'),
-                                                ],
+                                          child: ExpansionTile(
+                                            backgroundColor:
+                                                Colors.grey.shade300,
+                                            shape: ContinuousRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(35)),
+                                            title: Text("Cart ${index + 1}",
+                                                style: const TextStyle(
+                                                    color: Colors.black)),
+                                            children: [
+                                              ListView.separated(
+                                                itemBuilder: (context, ind) {
+                                                  return CartItemWidget(
+                                                    onPressed: () {
+                                                      _addToStory(jj[index]
+                                                          .products[ind]);
+                                                    },
+                                                    color: state
+                                                            .carts[index]
+                                                            .products[ind]
+                                                            .stutas
+                                                        ? Colors.red
+                                                        : const Color.fromARGB(
+                                                            255, 103, 145, 141),
+                                                    text: jj[index]
+                                                        .products[ind]
+                                                        .title,
+                                                    backgroundImage:
+                                                        NetworkImage(jj[index]
+                                                            .products[ind]
+                                                            .thumbnail),
+                                                    textButton: state
+                                                            .carts[index]
+                                                            .products[ind]
+                                                            .stutas
+                                                        ? "remove"
+                                                        : "add",
+                                                  );
+                                                },
+                                                itemCount:
+                                                    jj[index].products.length,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 10),
                                               ),
-                                            ),
-                                          if (!isLoading && reachedEnd)
-                                            const Center(
-                                              child: Text(
-                                                'No more items',
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            ),
-                                          const SizedBox(height: 12),
-                                        ],
-                                      );
-                                    } else {
-                                      return Container(
-                                        key: ValueKey(state.carts[index].id),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                              const SizedBox(height: 20),
+                                            ],
+                                          ),
                                         ),
-                                        child: ExpansionTile(
-                                          backgroundColor: Colors.grey.shade300,
-                                          shape: ContinuousRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(35)),
-                                          title: Text(
-                                              "Cart ${state.carts[index].id}",
-                                              style: const TextStyle(
-                                                  color: Colors.black)),
-                                          children: [
-                                            ListView.separated(
-                                              itemBuilder: (context, ind) {
-                                                return CartItemWidget(
-                                                  onPressed: () {
-                                                    _addToStory(state
-                                                        .carts[index]
-                                                        .products[ind]);
-                                                  },
-                                                  color: state.carts[index]
-                                                          .products[ind].stutas
-                                                      ? Colors.red
-                                                      : const Color.fromARGB(
-                                                          255, 103, 145, 141),
-                                                  text: state.carts[index]
-                                                      .products[ind].title,
-                                                  backgroundImage: NetworkImage(
-                                                      state
-                                                          .carts[index]
-                                                          .products[ind]
-                                                          .thumbnail),
-                                                  textButton: state.carts[index]
-                                                          .products[ind].stutas
-                                                      ? "remove"
-                                                      : "add",
-                                                );
-                                              },
-                                              itemCount: state
-                                                  .carts[index].products.length,
-                                              shrinkWrap: true,
-                                              physics:
-                                                  const BouncingScrollPhysics(),
-                                              separatorBuilder: (context,
-                                                      index) =>
-                                                  const SizedBox(height: 10),
-                                            ),
-                                            const SizedBox(height: 20),
-                                          ],
-                                        ),
-                                      );
-                                    }
+                                        const SizedBox(height: 10),
+                                      ],
+                                    );
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(height: 15),
