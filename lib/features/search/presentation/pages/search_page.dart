@@ -4,6 +4,7 @@ import 'package:search_app/features/search/data/models/api_carts.dart';
 
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
+import 'package:search_app/features/search/presentation/widgets/refresh_widget.dart';
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/cart_item_widget.dart';
 
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/story_cart_list.dart';
@@ -31,6 +32,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   int num = 10;
+  bool isLoading = false;
+  bool reachedEnd = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Product> _allUsers = [];
@@ -65,8 +68,14 @@ class _SearchPageState extends State<SearchPage> {
     _scrollcontroller.addListener(() {
       if (_scrollcontroller.position.pixels ==
           _scrollcontroller.position.maxScrollExtent) {
-        setState(() {
-          pagination();
+        setState(() {});
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            isLoading = false;
+            if (_foundUsers.length >= _allUsers.length) {
+              reachedEnd = true;
+            }
+          });
         });
       }
     });
@@ -148,78 +157,87 @@ class _SearchPageState extends State<SearchPage> {
                         const SizedBox(height: 20),
                         Expanded(
                           child: _searchController.text.isEmpty
-                              ? ListView.separated(
-                                  controller: _scrollcontroller,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: jj.length,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          key: ValueKey(state.carts[index].id),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade300,
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: ExpansionTile(
-                                            backgroundColor:
-                                                Colors.grey.shade300,
-                                            shape: ContinuousRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(35)),
-                                            title: Text("Cart ${index + 1}",
-                                                style: const TextStyle(
-                                                    color: Colors.black)),
-                                            children: [
-                                              ListView.separated(
-                                                itemBuilder: (context, ind) {
-                                                  return CartItemWidget(
-                                                    onPressed: () {
-                                                      _addToStory(jj[index]
-                                                          .products[ind]);
-                                                    },
-                                                    color: state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? Colors.red
-                                                        : const Color.fromARGB(
-                                                            255, 103, 145, 141),
-                                                    text: jj[index]
-                                                        .products[ind]
-                                                        .title,
-                                                    backgroundImage:
-                                                        NetworkImage(jj[index]
-                                                            .products[ind]
-                                                            .thumbnail),
-                                                    textButton: state
-                                                            .carts[index]
-                                                            .products[ind]
-                                                            .stutas
-                                                        ? "remove"
-                                                        : "add",
-                                                  );
-                                                },
-                                                itemCount:
-                                                    jj[index].products.length,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const BouncingScrollPhysics(),
-                                                separatorBuilder: (context,
-                                                        index) =>
-                                                    const SizedBox(height: 10),
-                                              ),
-                                              const SizedBox(height: 20),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                      ],
-                                    );
+                              ? FetchMoreIndicator(
+                                  onAction: () {
+                                    pagination();
                                   },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(height: 15),
+                                  child: ListView.separated(
+                                    controller: _scrollcontroller,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: jj.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            key:
+                                                ValueKey(state.carts[index].id),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.shade300,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: ExpansionTile(
+                                              backgroundColor:
+                                                  Colors.grey.shade300,
+                                              shape: ContinuousRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          35)),
+                                              title: Text("Cart ${index + 1}",
+                                                  style: const TextStyle(
+                                                      color: Colors.black)),
+                                              children: [
+                                                ListView.separated(
+                                                  itemBuilder: (context, ind) {
+                                                    return CartItemWidget(
+                                                      onPressed: () {
+                                                        _addToStory(jj[index]
+                                                            .products[ind]);
+                                                      },
+                                                      color: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
+                                                          ? Colors.red
+                                                          : const Color
+                                                              .fromARGB(255,
+                                                              103, 145, 141),
+                                                      text: jj[index]
+                                                          .products[ind]
+                                                          .title,
+                                                      backgroundImage:
+                                                          NetworkImage(jj[index]
+                                                              .products[ind]
+                                                              .thumbnail),
+                                                      textButton: state
+                                                              .carts[index]
+                                                              .products[ind]
+                                                              .stutas
+                                                          ? "remove"
+                                                          : "add",
+                                                    );
+                                                  },
+                                                  itemCount:
+                                                      jj[index].products.length,
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const BouncingScrollPhysics(),
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          const SizedBox(
+                                                              height: 10),
+                                                ),
+                                                const SizedBox(height: 20),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 15),
+                                  ),
                                 )
                               : _searchController.text.isNotEmpty &&
                                       _foundUsers.isEmpty
@@ -341,9 +359,9 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             )
-          : const Scaffold(
+          : Scaffold(
               body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Colors.grey.shade700),
             )),
     );
   }
