@@ -31,6 +31,7 @@ class FetchMoreIndicator extends StatelessWidget {
             builder: (context, _) {
               final dy = controller.value.clamp(0.0, 1.25) *
                   -(height - (height * 0.25));
+
               return Stack(
                 children: [
                   Transform.translate(
@@ -59,18 +60,15 @@ class FetchMoreIndicator extends StatelessWidget {
                               ),
                             )
                           else
-                            const Icon(
-                              Icons.keyboard_arrow_up,
-                              color: Color(appContentColor),
-                            ),
-                          Text(
-                            controller.isLoading
-                                ? "Fetching..."
-                                : "Pull to fetch more",
-                            style: const TextStyle(
-                              color: Color(appContentColor),
-                            ),
-                          )
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 8.0),
+                              width: 16,
+                              height: 16,
+                              child: const CircularProgressIndicator(
+                                color: Color(appContentColor),
+                                strokeWidth: 2,
+                              ),
+                            )
                         ],
                       ),
                     ),

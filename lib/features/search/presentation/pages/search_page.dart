@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:search_app/constant/strings.dart';
 import 'package:search_app/features/search/data/models/api_carts.dart';
 
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/cart_item_widget.dart';
-import 'package:search_app/features/search/presentation/widgets/search_page_widget/pagination_refresh.dart';
 
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/story_cart_list.dart';
 import 'package:search_app/features/search/presentation/widgets/textfield_widget.dart';
@@ -55,6 +55,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   initState() {
+    _scrollcontroller.addListener(_scrolllistner);
     _foundUsers = _allUsers;
 
     super.initState();
@@ -135,18 +136,13 @@ class _SearchPageState extends State<SearchPage> {
                         const SizedBox(height: 20),
                         Expanded(
                           child: _searchController.text.isEmpty
-                              ? FetchMoreIndicator(
-                                  onAction: () {
-                                    setState(() {
-                                      BlocProvider.of<CartsCubit>(context)
-                                          .paginateCarts();
-                                    });
-                                  },
-                                  child: ListView.separated(
-                                    controller: _scrollcontroller,
-                                    physics: const BouncingScrollPhysics(),
-                                    itemCount: jj.length,
-                                    itemBuilder: (context, index) {
+                              ? ListView.separated(
+                                  controller: _scrollcontroller,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount:
+                                      isLoading ? jj.length + 1 : jj.length,
+                                  itemBuilder: (context, index) {
+                                    if (index < jj.length) {
                                       return Column(
                                         children: [
                                           Container(
@@ -175,8 +171,7 @@ class _SearchPageState extends State<SearchPage> {
                                                         _addToStory(jj[index]
                                                             .products[ind]);
                                                       },
-                                                      color: state
-                                                              .carts[index]
+                                                      color: jj[index]
                                                               .products[ind]
                                                               .stutas
                                                           ? Colors.red
@@ -190,8 +185,7 @@ class _SearchPageState extends State<SearchPage> {
                                                           NetworkImage(jj[index]
                                                               .products[ind]
                                                               .thumbnail),
-                                                      textButton: state
-                                                              .carts[index]
+                                                      textButton: jj[index]
                                                               .products[ind]
                                                               .stutas
                                                           ? "remove"
@@ -215,10 +209,19 @@ class _SearchPageState extends State<SearchPage> {
                                           const SizedBox(height: 10),
                                         ],
                                       );
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(height: 15),
-                                  ),
+                                    } else {
+                                      return const Center(
+                                          child: SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Color(appContentColor),
+                                        ),
+                                      ));
+                                    }
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 15),
                                 )
                               : _searchController.text.isNotEmpty &&
                                       _foundUsers.isEmpty
@@ -345,5 +348,18 @@ class _SearchPageState extends State<SearchPage> {
               child: CircularProgressIndicator(),
             )),
     );
+  }
+
+  Future<void> _scrolllistner() async {
+    if (_scrollcontroller.position.pixels ==
+        _scrollcontroller.position.maxScrollExtent) {
+      setState(() {
+        isLoading = true;
+      });
+      await BlocProvider.of<CartsCubit>(context).paginateCarts();
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }
