@@ -21,6 +21,15 @@ class CartsLoaded extends CartsState {
   List<Object> get props => [carts];
 }
 
+class PaginationCarts extends CartsState {
+  final List<Cart> carts;
+
+  const PaginationCarts(this.carts);
+
+  @override
+  List<Object> get props => [carts];
+}
+
 class CartsError extends CartsState {
   final String message;
 

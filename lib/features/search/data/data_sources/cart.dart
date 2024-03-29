@@ -7,8 +7,8 @@ class CartRemoteDataSource {
 
   CartRemoteDataSource(this.apiUrl);
 
-  Future<List<Cart>> fetchCarts() async {
-    const apiUrl = 'https://dummyjson.com/carts';
+  Future<List<Cart>> fetchCarts(int limit, int skip) async {
+    String apiUrl = 'https://dummyjson.com/carts?skip=$skip&limit=$limit';
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);

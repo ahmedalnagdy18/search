@@ -9,9 +9,9 @@ class CartUsecase {
 
   Future<List<Cart>> call(CartEntity cartEntity) async {
     try {
-      return await repository.getCarts();
+      return await repository.getCarts(cartEntity);
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 }

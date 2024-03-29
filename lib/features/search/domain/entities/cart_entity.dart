@@ -1,12 +1,12 @@
 class CartEntity {
-  final int total;
+  final int skip;
   final int limit;
 
-  CartEntity({required this.total, required this.limit});
+  CartEntity([this.skip = 0, this.limit = 20]);
 
   toJson() {
     return {
-      "total": total,
+      "skip": skip,
       "limit": limit,
     };
   }
