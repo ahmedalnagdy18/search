@@ -15,7 +15,6 @@ class CartsCubit extends Cubit<CartsState> {
     try {
       carts = await cartUsecase(CartEntity());
       emit(CartsLoaded(carts));
-      print('111111111');
     } catch (e) {
       emit(CartsError('Failed to load carts: $e'));
     }
@@ -24,10 +23,8 @@ class CartsCubit extends Cubit<CartsState> {
   Future<void> paginateCarts() async {
     try {
       carts.addAll(await cartUsecase(CartEntity(skip, 10)));
-      print('2222222222');
       if (skip == 0) {
         skip = 10;
-        print('3333333333');
       } else {
         skip = 0;
       }

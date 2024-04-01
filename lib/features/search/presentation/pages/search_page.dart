@@ -18,13 +18,8 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  List<Cart> hh = [];
   List<Cart> jj = [];
-  int ord = 0;
-
-  int num = 10;
   bool isLoading = false;
-  bool reachedEnd = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Product> _allUsers = [];
