@@ -19,7 +19,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   List<Cart> jj = [];
-  bool isLoading = false;
+  // bool isLoading = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Product> _allUsers = [];
@@ -68,12 +68,12 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void removeFromStory(Product product) {
-    setState(() {
-      product.stutas = false;
-      _story.remove(product);
-    });
-  }
+  // void removeFromStory(Product product) {
+  //   setState(() {
+  //     product.stutas = false;
+  //     _story.remove(product);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class _SearchPageState extends State<SearchPage> {
                                   itemBuilder: (context, index) {
                                     return StoryCartList(
                                         onTap: (() =>
-                                            removeFromStory(_story[index])),
+                                            _addToStory(_story[index])),
                                         backgroundImage: NetworkImage(
                                             _story[index].thumbnail),
                                         title:
@@ -134,8 +134,7 @@ class _SearchPageState extends State<SearchPage> {
                               ? ListView.separated(
                                   controller: _scrollcontroller,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount:
-                                      isLoading ? jj.length + 1 : jj.length,
+                                  itemCount: jj.length + 1,
                                   itemBuilder: (context, index) {
                                     if (index < jj.length) {
                                       return Column(
@@ -349,11 +348,11 @@ class _SearchPageState extends State<SearchPage> {
     if (_scrollcontroller.position.pixels ==
         _scrollcontroller.position.maxScrollExtent) {
       setState(() {
-        isLoading = true;
+        //    isLoading = true;
       });
       await BlocProvider.of<CartsCubit>(context).paginateCarts();
       setState(() {
-        isLoading = false;
+        //     isLoading = false;
       });
     }
   }
