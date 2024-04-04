@@ -18,7 +18,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  List<Cart> jj = [];
+  List<Cart> carts = [];
   // bool isLoading = false;
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
@@ -80,7 +80,7 @@ class _SearchPageState extends State<SearchPage> {
     return BlocConsumer<CartsCubit, CartsState>(
       listener: (context, state) {
         if (state is CartsLoaded) {
-          jj = state.carts;
+          carts = state.carts;
         }
       },
       builder: (context, state) => state is CartsLoaded
@@ -134,9 +134,9 @@ class _SearchPageState extends State<SearchPage> {
                               ? ListView.separated(
                                   controller: _scrollcontroller,
                                   physics: const BouncingScrollPhysics(),
-                                  itemCount: jj.length + 1,
+                                  itemCount: carts.length + 1,
                                   itemBuilder: (context, index) {
-                                    if (index < jj.length) {
+                                    if (index < carts.length) {
                                       return Column(
                                         children: [
                                           Container(
@@ -162,32 +162,34 @@ class _SearchPageState extends State<SearchPage> {
                                                   itemBuilder: (context, ind) {
                                                     return CartItemWidget(
                                                       onPressed: () {
-                                                        _addToStory(jj[index]
+                                                        _addToStory(carts[index]
                                                             .products[ind]);
                                                       },
-                                                      color: jj[index]
+                                                      color: carts[index]
                                                               .products[ind]
                                                               .stutas
                                                           ? Colors.red
                                                           : const Color
                                                               .fromARGB(255,
                                                               103, 145, 141),
-                                                      text: jj[index]
+                                                      text: carts[index]
                                                           .products[ind]
                                                           .title,
                                                       backgroundImage:
-                                                          NetworkImage(jj[index]
-                                                              .products[ind]
-                                                              .thumbnail),
-                                                      textButton: jj[index]
+                                                          NetworkImage(
+                                                              carts[index]
+                                                                  .products[ind]
+                                                                  .thumbnail),
+                                                      textButton: carts[index]
                                                               .products[ind]
                                                               .stutas
                                                           ? "remove"
                                                           : "add",
                                                     );
                                                   },
-                                                  itemCount:
-                                                      jj[index].products.length,
+                                                  itemCount: carts[index]
+                                                      .products
+                                                      .length,
                                                   shrinkWrap: true,
                                                   physics:
                                                       const BouncingScrollPhysics(),
