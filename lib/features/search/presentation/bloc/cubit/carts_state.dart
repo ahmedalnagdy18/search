@@ -38,3 +38,9 @@ class CartsError extends CartsState {
   @override
   List<Object> get props => [message];
 }
+
+class Cartsadded extends CartsState {
+  final List<Product> products;
+
+  const Cartsadded({required this.products});
+}

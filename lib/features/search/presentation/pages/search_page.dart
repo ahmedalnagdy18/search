@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search_app/constant/strings.dart';
 import 'package:search_app/features/search/data/models/api_carts.dart';
-
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_cubit.dart';
 import 'package:search_app/features/search/presentation/bloc/cubit/carts_state.dart';
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/cart_item_widget.dart';
-
 import 'package:search_app/features/search/presentation/widgets/search_page_widget/story_cart_list.dart';
 import 'package:search_app/features/search/presentation/widgets/textfield_widget.dart';
 
@@ -19,10 +17,12 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   List<Cart> carts = [];
-  // bool isLoading = false;
+  List<Product> story = [];
+
   final _scrollcontroller = ScrollController();
   final _searchController = TextEditingController();
   final List<Product> _allUsers = [];
+
   void _searchFilter(String title, List<Cart> carts) {
     List<Product> results = [];
 
@@ -38,7 +38,6 @@ class _SearchPageState extends State<SearchPage> {
           }
         }
       }
-
       setState(() {
         _foundUsers = results;
       });
@@ -46,7 +45,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   List<Product> _foundUsers = [];
-  final List<Product> _story = [];
 
   @override
   initState() {
@@ -56,25 +54,6 @@ class _SearchPageState extends State<SearchPage> {
     super.initState();
   }
 
-  void _addToStory(Product product) {
-    setState(() {
-      if (product.stutas == false) {
-        product.stutas = true;
-        _story.add(product);
-      } else {
-        product.stutas = false;
-        _story.remove(product);
-      }
-    });
-  }
-
-  // void removeFromStory(Product product) {
-  //   setState(() {
-  //     product.stutas = false;
-  //     _story.remove(product);
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<CartsCubit, CartsState>(
@@ -82,8 +61,11 @@ class _SearchPageState extends State<SearchPage> {
         if (state is CartsLoaded) {
           carts = state.carts;
         }
+        if (state is Cartsadded) {
+          story = BlocProvider.of<CartsCubit>(context).story;
+        }
       },
-      builder: (context, state) => state is CartsLoaded
+      builder: (context, state) => state is CartsLoaded || state is Cartsadded
           ? SafeArea(
               child: Scaffold(
                 backgroundColor: Colors.white,
@@ -94,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 30),
-                        _story.isNotEmpty
+                        story.isNotEmpty
                             ? SizedBox(
                                 height: 80,
                                 child: ListView.separated(
@@ -103,24 +85,28 @@ class _SearchPageState extends State<SearchPage> {
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return StoryCartList(
-                                        onTap: (() =>
-                                            _addToStory(_story[index])),
+                                        onTap: (() => setState(() {
+                                              BlocProvider.of<CartsCubit>(
+                                                      context)
+                                                  .addToStory(BlocProvider.of<
+                                                          CartsCubit>(context)
+                                                      .story[index]);
+                                            })),
                                         backgroundImage: NetworkImage(
-                                            _story[index].thumbnail),
+                                            story[index].thumbnail),
                                         title:
-                                            "Price: ${_story[index].price} \$");
+                                            "Price: ${story[index].price} \$");
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(width: 10),
-                                  itemCount: _story.length,
+                                  itemCount: story.length,
                                 ),
                               )
                             : const Center(
                                 child: Text("Add Products here ...")),
                         const SizedBox(height: 20),
                         TextfieldWidget(
-                          onChanged: (value) =>
-                              _searchFilter(value, state.carts),
+                          onChanged: (value) => _searchFilter(value, carts),
                           controller: _searchController,
                           onPressed: () {
                             setState(() {
@@ -140,8 +126,6 @@ class _SearchPageState extends State<SearchPage> {
                                       return Column(
                                         children: [
                                           Container(
-                                            key:
-                                                ValueKey(state.carts[index].id),
                                             decoration: BoxDecoration(
                                               color: Colors.grey.shade300,
                                               borderRadius:
@@ -162,8 +146,15 @@ class _SearchPageState extends State<SearchPage> {
                                                   itemBuilder: (context, ind) {
                                                     return CartItemWidget(
                                                       onPressed: () {
-                                                        _addToStory(carts[index]
-                                                            .products[ind]);
+                                                        setState(() {
+                                                          BlocProvider.of<
+                                                                      CartsCubit>(
+                                                                  context)
+                                                              .addToStory(carts[
+                                                                          index]
+                                                                      .products[
+                                                                  ind]);
+                                                        });
                                                       },
                                                       color: carts[index]
                                                               .products[ind]
@@ -208,8 +199,8 @@ class _SearchPageState extends State<SearchPage> {
                                     } else {
                                       return const Center(
                                           child: SizedBox(
-                                        height: 20,
-                                        width: 20,
+                                        height: 30,
+                                        width: 30,
                                         child: CircularProgressIndicator(
                                           color: Color(appContentColor),
                                         ),
@@ -228,7 +219,7 @@ class _SearchPageState extends State<SearchPage> {
                                   : ListView.separated(
                                       controller: _scrollcontroller,
                                       physics: const BouncingScrollPhysics(),
-                                      itemCount: state.carts
+                                      itemCount: carts
                                           .where((element) => element.products
                                               .where((element) => element.title
                                                   .toLowerCase()
@@ -239,7 +230,7 @@ class _SearchPageState extends State<SearchPage> {
                                           .length,
                                       itemBuilder: (context, index) {
                                         return Container(
-                                          key: ValueKey(state.carts[index].id),
+                                          key: ValueKey(carts[index].id),
                                           decoration: BoxDecoration(
                                             color: Colors.grey.shade300,
                                             borderRadius:
@@ -249,19 +240,23 @@ class _SearchPageState extends State<SearchPage> {
                                             itemBuilder: (context, ind) {
                                               return CartItemWidget(
                                                 onPressed: () {
-                                                  _addToStory(state
-                                                      .carts[index].products
-                                                      .where((element) => element
-                                                          .title
-                                                          .toLowerCase()
-                                                          .contains(
-                                                              _searchController
-                                                                  .text
-                                                                  .toLowerCase()))
-                                                      .elementAt(ind));
+                                                  setState(() {
+                                                    BlocProvider.of<CartsCubit>(
+                                                            context)
+                                                        .addToStory(carts[index]
+                                                            .products
+                                                            .where((element) => element
+                                                                .title
+                                                                .toLowerCase()
+                                                                .contains(
+                                                                    _searchController
+                                                                        .text
+                                                                        .toLowerCase()))
+                                                            .elementAt(ind));
+                                                  });
                                                 },
-                                                color: state
-                                                        .carts[index].products
+                                                color: carts[index]
+                                                        .products
                                                         .where((element) => element
                                                             .title
                                                             .toLowerCase()
@@ -274,8 +269,8 @@ class _SearchPageState extends State<SearchPage> {
                                                     ? Colors.red
                                                     : const Color.fromARGB(
                                                         255, 103, 145, 141),
-                                                text: state
-                                                    .carts[index].products
+                                                text: carts[index]
+                                                    .products
                                                     .where((element) => element
                                                         .title
                                                         .toLowerCase()
@@ -285,8 +280,9 @@ class _SearchPageState extends State<SearchPage> {
                                                                 .toLowerCase()))
                                                     .elementAt(ind)
                                                     .title,
-                                                backgroundImage: NetworkImage(state
-                                                    .carts[index].products
+                                                backgroundImage: NetworkImage(carts[
+                                                        index]
+                                                    .products
                                                     .where((element) => element
                                                         .title
                                                         .toLowerCase()
@@ -296,8 +292,8 @@ class _SearchPageState extends State<SearchPage> {
                                                                 .toLowerCase()))
                                                     .elementAt(ind)
                                                     .thumbnail),
-                                                textButton: state
-                                                        .carts[index].products
+                                                textButton: carts[index]
+                                                        .products
                                                         .where((element) => element
                                                             .title
                                                             .toLowerCase()
@@ -311,8 +307,8 @@ class _SearchPageState extends State<SearchPage> {
                                                     : "add",
                                               );
                                             },
-                                            itemCount: state
-                                                .carts[index].products
+                                            itemCount: carts[index]
+                                                .products
                                                 .where((element) => element
                                                     .title
                                                     .toLowerCase()
@@ -341,7 +337,9 @@ class _SearchPageState extends State<SearchPage> {
             )
           : const Scaffold(
               body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Color(appContentColor),
+              ),
             )),
     );
   }
@@ -349,13 +347,9 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _scrolllistner() async {
     if (_scrollcontroller.position.pixels ==
         _scrollcontroller.position.maxScrollExtent) {
-      setState(() {
-        //    isLoading = true;
-      });
+      setState(() {});
       await BlocProvider.of<CartsCubit>(context).paginateCarts();
-      setState(() {
-        //     isLoading = false;
-      });
+      setState(() {});
     }
   }
 }

@@ -8,6 +8,7 @@ class CartsCubit extends Cubit<CartsState> {
   final CartUsecase cartUsecase;
   List<Cart> carts = [];
   int skip = 0;
+  List<Product> story = [];
   CartsCubit(this.cartUsecase) : super(CartsInitial());
 
   Future<void> getCarts() async {
@@ -30,6 +31,18 @@ class CartsCubit extends Cubit<CartsState> {
       }
     } catch (e) {
       emit(CartsError('Failed to load carts: $e'));
+    }
+  }
+
+  void addToStory(Product product) {
+    if (product.stutas == false) {
+      product.stutas = true;
+      story.add(product);
+      emit(Cartsadded(products: story));
+    } else {
+      product.stutas = false;
+      story.remove(product);
+      emit(Cartsadded(products: story));
     }
   }
 }
