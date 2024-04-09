@@ -11,6 +11,7 @@ import 'package:search_app/features/search/presentation/pages/search_page.dart';
 void main() {
   // init();
   runApp(const MyApp());
+  Bloc.observer = MyBlocObserver();
 }
 
 class MyApp extends StatelessWidget {
@@ -27,5 +28,31 @@ class MyApp extends StatelessWidget {
         child: const SearchPage(),
       ),
     );
+  }
+}
+
+class MyBlocObserver extends BlocObserver {
+  @override
+  void onEvent(Bloc bloc, Object? event) {
+    super.onEvent(bloc, event);
+    // TODO: implement onEvent
+  }
+
+  @override
+  void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+    // TODO: implement onError
+    super.onError(bloc, error, stackTrace);
+  }
+
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    print(change);
+  }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    super.onTransition(bloc, transition);
+    // TODO: implement onChange
   }
 }

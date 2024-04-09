@@ -62,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
           carts = state.carts;
         }
         if (state is Cartsadded) {
-          story = BlocProvider.of<CartsCubit>(context).story;
+          story = state.products;
         }
       },
       builder: (context, state) => state is CartsLoaded || state is Cartsadded
@@ -85,13 +85,9 @@ class _SearchPageState extends State<SearchPage> {
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return StoryCartList(
-                                        onTap: (() => setState(() {
-                                              BlocProvider.of<CartsCubit>(
-                                                      context)
-                                                  .addToStory(BlocProvider.of<
-                                                          CartsCubit>(context)
-                                                      .story[index]);
-                                            })),
+                                        onTap: (() =>
+                                            BlocProvider.of<CartsCubit>(context)
+                                                .addToStory(story[index])),
                                         backgroundImage: NetworkImage(
                                             story[index].thumbnail),
                                         title:
@@ -146,15 +142,12 @@ class _SearchPageState extends State<SearchPage> {
                                                   itemBuilder: (context, ind) {
                                                     return CartItemWidget(
                                                       onPressed: () {
-                                                        setState(() {
-                                                          BlocProvider.of<
-                                                                      CartsCubit>(
-                                                                  context)
-                                                              .addToStory(carts[
-                                                                          index]
-                                                                      .products[
-                                                                  ind]);
-                                                        });
+                                                        BlocProvider.of<
+                                                                    CartsCubit>(
+                                                                context)
+                                                            .addToStory(carts[
+                                                                    index]
+                                                                .products[ind]);
                                                       },
                                                       color: carts[index]
                                                               .products[ind]

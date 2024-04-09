@@ -38,11 +38,10 @@ class CartsCubit extends Cubit<CartsState> {
     if (product.stutas == false) {
       product.stutas = true;
       story.add(product);
-      emit(Cartsadded(products: story));
     } else {
       product.stutas = false;
       story.remove(product);
-      emit(Cartsadded(products: story));
     }
+    emit(Cartsadded(story));
   }
 }
